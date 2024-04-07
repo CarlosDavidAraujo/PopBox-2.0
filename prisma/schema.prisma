@@ -1,0 +1,157 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  user_id      Int
+  expires      DateTime
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+// Definição da tabela User
+model User {
+  id                  Int          @id @default(autoincrement())
+  name                String
+  email               String       @unique
+  email_verified      DateTime?
+  hashed_password     String
+  image               String?
+  gender              Gender
+  phone               String?
+  cellphone           String?
+  fax                 String?
+  department_id       Int?
+  created_at          DateTime     @default(now())
+  updated_at          DateTime     @updatedAt
+  department          Department?  @relation("Usuario_Departamento_Pertencente", fields: [department_id], references: [id])
+  created_departments Department[] @relation("Usuario_Departamento_Criado")
+  sessions            Session[]
+  created_folders     Folder[]
+  written_documents   Document[]   @relation("Usuario_Documento_Autor")
+  received_documents  Document[]   @relation("Usuario_Documento_Destinatario")
+  sended_documents    Document[]   @relation("Usuario_Documento_Remetente")
+  Repository          Repository[]
+  Attachment          Attachment[]
+  Stamp               Stamp[]
+}
+
+// Definição da tabela Setor
+model Department {
+  id            Int          @id @default(autoincrement())
+  name          String
+  acronym       String?
+  address       String?
+  created_by_id Int
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+  created_by    User         @relation("Usuario_Departamento_Criado", fields: [created_by_id], references: [id])
+  employees     User[]       @relation("Usuario_Departamento_Pertencente")
+  Document      Document[]
+  Repository    Repository[]
+}
+
+// Definição da tabela Pasta
+model Folder {
+  id               Int        @id @default(autoincrement())
+  name             String
+  parent_folder_id Int?
+  created_by_id    Int
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
+  created_by       User       @relation(fields: [created_by_id], references: [id])
+  parent_folder    Folder?    @relation("Pasta_Pasta", fields: [parent_folder_id], references: [id])
+  child_folders    Folder[]   @relation("Pasta_Pasta")
+  Document         Document[]
+}
+
+// Definição da tabela Documento
+model Document {
+  id            Int        @id @default(autoincrement())
+  name          String
+  document_url  String
+  city          String
+  date          DateTime
+  subject       String
+  header        String
+  author_id     Int
+  receiver_id   Int
+  sender_id     Int
+  department_id Int
+  folder_id     Int?
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+  author        User       @relation("Usuario_Documento_Autor", fields: [author_id], references: [id])
+  receiver      User       @relation("Usuario_Documento_Destinatario", fields: [receiver_id], references: [id])
+  sender        User       @relation("Usuario_Documento_Remetente", fields: [sender_id], references: [id])
+  department    Department @relation(fields: [department_id], references: [id])
+  folder        Folder?    @relation(fields: [folder_id], references: [id])
+
+  Attachment    Attachment[]
+  DocumentStamp DocumentStamp[]
+}
+
+// Definição da tabela Repository
+model Repository {
+  id            Int          @id @default(autoincrement())
+  name          String
+  description   String?
+  department_id Int
+  created_by_id Int
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+  department    Department   @relation(fields: [department_id], references: [id])
+  created_by    User         @relation(fields: [created_by_id], references: [id])
+  Attachment    Attachment[]
+}
+
+// Definição da tabela Anexo
+model Attachment {
+  id             Int        @id @default(autoincrement())
+  name           String
+  attachment_url String
+  type           String?
+  repository_id  Int
+  document_id    Int?
+  created_by_id  Int
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+  repository     Repository @relation(fields: [repository_id], references: [id])
+  document       Document?  @relation(fields: [document_id], references: [id])
+  created_by     User       @relation(fields: [created_by_id], references: [id])
+}
+
+// Definição da tabela Carimbo
+model Stamp {
+  id            Int             @id @default(autoincrement())
+  description   String
+  created_by_id Int
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+  created_by    User            @relation(fields: [created_by_id], references: [id])
+  DocumentStamp DocumentStamp[]
+}
+
+model DocumentStamp {
+  document_id Int
+  stamp_id    Int
+  document    Document @relation(fields: [document_id], references: [id])
+  stamp       Stamp    @relation(fields: [stamp_id], references: [id])
+
+  @@id([document_id, stamp_id])
+}
+
+// Definição do tipo enumerado Gender
+enum Gender {
+  Male   @map("Maculino")
+  Female @map("Feminino")
+}
