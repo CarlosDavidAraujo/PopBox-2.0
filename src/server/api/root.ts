@@ -1,8 +1,10 @@
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { documentsRouter } from "./routers/documents";
-import { repositoriesRouter } from "./routers/repositories";
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { foldersRouter } from "./routers/folders";
+import { attachmentsRouter } from "./routers/attachments";
+import { departmentsRouter } from "./routers/departments";
+import { userRouter } from "./routers/users";
 
 /**
  * This is the primary router for your server.
@@ -11,8 +13,10 @@ import { foldersRouter } from "./routers/folders";
  */
 export const appRouter = createTRPCRouter({
   documents: documentsRouter,
-  repositories: repositoriesRouter,
   folders: foldersRouter,
+  attachments: attachmentsRouter,
+  departments: departmentsRouter,
+  users: userRouter
 });
 
 // export type definition of API

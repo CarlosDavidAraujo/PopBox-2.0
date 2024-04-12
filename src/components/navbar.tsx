@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Inbox, LibraryBig, UserCog } from "lucide-react";
+import { Inbox, LibraryBig, Trash2, UserCog } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -21,6 +21,11 @@ const links = [
     href: "/admin",
     icon: <UserCog className="h-4 w-4" />,
   },
+  {
+    label: "Lixeira",
+    href: "/trash",
+    icon: <Trash2 className="h-4 w-4" />,
+  },
 ];
 
 export function Navbar() {
@@ -32,7 +37,7 @@ export function Navbar() {
           key={link.href}
           href={link.href}
           className={cn(
-            "text-muted-foreground hover:text-primary flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
             pathname.includes(link.href) && "bg-muted text-primary",
           )}
         >

@@ -9,6 +9,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 import { db } from "@/server/db";
 import { env } from "@/env";
+import type { Department } from "@prisma/client";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -20,7 +21,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      department?: string;
+      department?: Department;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -86,15 +87,11 @@ export const authOptions: NextAuthOptions = {
         // Add logic here to look up the user from the credentials supplied
         const user = await db.user.findUnique({
           include: {
-            department: {
-              select: {
-                name: true,
-              },
-            },
+            department: true,
           },
           where: {
             email: credentials.email,
-            hashed_password: credentials.password,
+            password: credentials.password,
           },
         });
 
@@ -102,13 +99,13 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const { hashed_password, ...userWithoutPassword } = user;
+        const { password, ...userWithoutPassword } = user;
 
         // Any object returned will be saved in `user` property of the JWT
         return {
           ...userWithoutPassword,
           id: userWithoutPassword.id.toString(),
-          department: userWithoutPassword.department?.name,
+          department: userWithoutPassword.department,
         };
       },
     }),

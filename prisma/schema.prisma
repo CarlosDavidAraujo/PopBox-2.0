@@ -24,7 +24,7 @@ model User {
   name                String
   email               String       @unique
   email_verified      DateTime?
-  hashed_password     String
+  password            String
   image               String?
   gender              Gender
   phone               String?
@@ -40,43 +40,46 @@ model User {
   written_documents   Document[]   @relation("Usuario_Documento_Autor")
   received_documents  Document[]   @relation("Usuario_Documento_Destinatario")
   sended_documents    Document[]   @relation("Usuario_Documento_Remetente")
-  Repository          Repository[]
   Attachment          Attachment[]
   Stamp               Stamp[]
 }
 
 // Definição da tabela Setor
 model Department {
-  id            Int          @id @default(autoincrement())
-  name          String
-  acronym       String?
-  address       String?
+  id            Int        @id @default(autoincrement())
+  name          String     @unique
+  acronym       String     @unique
+  address       String
   created_by_id Int
-  created_at    DateTime     @default(now())
-  updated_at    DateTime     @updatedAt
-  created_by    User         @relation("Usuario_Departamento_Criado", fields: [created_by_id], references: [id])
-  employees     User[]       @relation("Usuario_Departamento_Pertencente")
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+  created_by    User       @relation("Usuario_Departamento_Criado", fields: [created_by_id], references: [id])
+  employees     User[]     @relation("Usuario_Departamento_Pertencente")
   Document      Document[]
-  Repository    Repository[]
+  folders       Folder[]
 }
 
 // Definição da tabela Pasta
 model Folder {
-  id               Int        @id @default(autoincrement())
+  id               String       @id @default(cuid())
   name             String
-  parent_folder_id Int?
+  parent_folder_id String?
   created_by_id    Int
-  created_at       DateTime   @default(now())
-  updated_at       DateTime   @updatedAt
-  created_by       User       @relation(fields: [created_by_id], references: [id])
-  parent_folder    Folder?    @relation("Pasta_Pasta", fields: [parent_folder_id], references: [id])
-  child_folders    Folder[]   @relation("Pasta_Pasta")
+  departmentId     Int
+  isTrash          Boolean      @default(false)
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+  created_by       User         @relation(fields: [created_by_id], references: [id])
+  parent_folder    Folder?      @relation("Pasta_Pasta", fields: [parent_folder_id], references: [id])
+  child_folders    Folder[]     @relation("Pasta_Pasta")
+  department       Department   @relation(fields: [departmentId], references: [id])
+  attachments      Attachment[]
   Document         Document[]
 }
 
 // Definição da tabela Documento
 model Document {
-  id            Int        @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   name          String
   document_url  String
   city          String
@@ -87,47 +90,30 @@ model Document {
   receiver_id   Int
   sender_id     Int
   department_id Int
-  folder_id     Int?
-  created_at    DateTime   @default(now())
-  updated_at    DateTime   @updatedAt
-  author        User       @relation("Usuario_Documento_Autor", fields: [author_id], references: [id])
-  receiver      User       @relation("Usuario_Documento_Destinatario", fields: [receiver_id], references: [id])
-  sender        User       @relation("Usuario_Documento_Remetente", fields: [sender_id], references: [id])
-  department    Department @relation(fields: [department_id], references: [id])
-  folder        Folder?    @relation(fields: [folder_id], references: [id])
-
-  Attachment    Attachment[]
+  folder_id     String?
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+  author        User            @relation("Usuario_Documento_Autor", fields: [author_id], references: [id])
+  receiver      User            @relation("Usuario_Documento_Destinatario", fields: [receiver_id], references: [id])
+  sender        User            @relation("Usuario_Documento_Remetente", fields: [sender_id], references: [id])
+  department    Department      @relation(fields: [department_id], references: [id])
+  folder        Folder?         @relation(fields: [folder_id], references: [id])
   DocumentStamp DocumentStamp[]
-}
-
-// Definição da tabela Repository
-model Repository {
-  id            Int          @id @default(autoincrement())
-  name          String
-  description   String?
-  department_id Int
-  created_by_id Int
-  created_at    DateTime     @default(now())
-  updated_at    DateTime     @updatedAt
-  department    Department   @relation(fields: [department_id], references: [id])
-  created_by    User         @relation(fields: [created_by_id], references: [id])
-  Attachment    Attachment[]
 }
 
 // Definição da tabela Anexo
 model Attachment {
-  id             Int        @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   name           String
   attachment_url String
-  type           String?
-  repository_id  Int
-  document_id    Int?
+  type           String
+  size           Int
+  folder_id      String
   created_by_id  Int
-  created_at     DateTime   @default(now())
-  updated_at     DateTime   @updatedAt
-  repository     Repository @relation(fields: [repository_id], references: [id])
-  document       Document?  @relation(fields: [document_id], references: [id])
-  created_by     User       @relation(fields: [created_by_id], references: [id])
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  folder         Folder   @relation(fields: [folder_id], references: [id])
+  created_by     User     @relation(fields: [created_by_id], references: [id])
 }
 
 // Definição da tabela Carimbo

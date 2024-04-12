@@ -15,24 +15,29 @@ import { insertFolderSchema } from "@/validators";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
+import { toast } from "./ui/use-toast";
+import { useFolder } from "./folder-provider";
 
-export function NewFolderForm({
-  parentFolderId,
-}: {
-  parentFolderId: number | null;
-}) {
+export function NewFolderForm() {
+  const { folder, storagePath } = useFolder();
+
   const form = useForm<z.infer<typeof insertFolderSchema>>({
     resolver: zodResolver(insertFolderSchema),
     defaultValues: {
       name: "",
-      parent_folder_id: parentFolderId,
+      parent_folder_id: folder?.id,
+      storagePath: storagePath,
     },
   });
 
   const utils = api.useUtils();
   const { mutate } = api.folders.createOne.useMutation({
     onSuccess: () =>
-      utils.folders.manyByParentId.invalidate({ parentFolderId }),
+      utils.folders.getOneById.invalidate({
+        folderId: folder?.id,
+      }),
+    onError: (error) =>
+      toast({ description: error.message, variant: "destructive" }),
   });
 
   const onSubmit = form.handleSubmit((values) => mutate(values));

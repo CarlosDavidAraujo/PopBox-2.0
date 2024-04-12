@@ -1,18 +1,6 @@
 import Link from "next/link";
-import {
-  Bell,
-  CircleUser,
-  Home,
-  LineChart,
-  Menu,
-  Package,
-  Package2,
-  Search,
-  ShoppingCart,
-  Users,
-} from "lucide-react";
+import { Bell, CircleUser, Menu, Package2 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -44,7 +32,7 @@ export default async function AuthenticatedRoutesLayout({
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <div className="bg-muted/40 hidden border-r md:block">
+      <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           {/*  -------------------------------------SIDEBAR------------------------------------------- */}
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
@@ -79,7 +67,7 @@ export default async function AuthenticatedRoutesLayout({
         </div>
       </div>
       <div className="flex flex-col">
-        <header className="bg-muted/40 flex h-14 items-center gap-4 border-b px-4 lg:h-[60px] lg:px-6">
+        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
           <Sheet>
             <SheetTrigger asChild>
               <Button
