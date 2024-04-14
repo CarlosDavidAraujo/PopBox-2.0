@@ -101,7 +101,7 @@ export default async function AuthenticatedRoutesLayout({
           </Sheet>
           <div className="w-full flex-1 font-semibold">
             <h3 className="text-lg">
-              {session?.user.name} {session?.user.department}
+              {session?.user.name} {session?.user.department?.name}
             </h3>
           </div>
           <DropdownMenu>

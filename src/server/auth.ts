@@ -10,6 +10,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/server/db";
 import { env } from "@/env";
 import type { Department } from "@prisma/client";
+import { compareSync } from "bcrypt";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -91,13 +92,17 @@ export const authOptions: NextAuthOptions = {
           },
           where: {
             email: credentials.email,
-            password: credentials.password,
           },
         });
 
-        if (!user) {
-          return null;
-        }
+        if (!user) return null;
+
+        const passwordMatched = compareSync(
+          credentials.password,
+          user.password,
+        );
+
+        if (!passwordMatched) return null;
 
         const { password, ...userWithoutPassword } = user;
 

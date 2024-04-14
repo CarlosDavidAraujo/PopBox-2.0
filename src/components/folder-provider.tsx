@@ -6,12 +6,11 @@ import { type ReactNode, createContext, useContext } from "react";
 
 type FolderContextValue = {
   folder: RouterOutputs["folders"]["getOneById"];
-  storagePath: string;
 };
 
 const FolderContext = createContext({} as FolderContextValue);
 
-const useFolder = () => {
+const useCurrentFolder = () => {
   const folderContext = useContext(FolderContext);
   if (!folderContext)
     throw new Error("useFolder must be used inside a FolderProvider");
@@ -22,24 +21,20 @@ const useFolder = () => {
 const FolderProvider = ({
   children,
   initialFolder,
-  folderId,
-  storagePath,
 }: {
   initialFolder: RouterOutputs["folders"]["getOneById"];
   children: ReactNode;
-  folderId: string;
-  storagePath: string;
 }) => {
   const { data: folder } = api.folders.getOneById.useQuery(
-    { folderId },
+    { folderId: initialFolder?.id ?? "" },
     { initialData: initialFolder },
   );
 
   return (
-    <FolderContext.Provider value={{ folder, storagePath }}>
+    <FolderContext.Provider value={{ folder }}>
       {children}
     </FolderContext.Provider>
   );
 };
 
-export { FolderProvider, useFolder };
+export { FolderProvider, useCurrentFolder };

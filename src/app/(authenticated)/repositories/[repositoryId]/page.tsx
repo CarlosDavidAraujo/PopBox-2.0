@@ -10,6 +10,7 @@ import Link from "next/link";
 import React from "react";
 import { FolderProvider } from "@/components/folder-provider";
 import { FolderList } from "@/components/folder-list";
+import { getServerAuthSession } from "@/server/auth";
 
 export default async function RepositoriesPage({
   params,
@@ -24,7 +25,7 @@ export default async function RepositoriesPage({
     folderId: params.repositoryId,
   });
 
-  const storagePath = parentFolders.map((folder) => folder.id).join("/");
+  const session = await getServerAuthSession();
 
   return (
     <div className="flex flex-grow flex-col gap-6">
@@ -39,7 +40,7 @@ export default async function RepositoriesPage({
           <BreadcrumbSeparator />
           {parentFolders.map(
             (folder) =>
-              folder.id !== "_root" && (
+              folder.id !== session?.user.id && (
                 <React.Fragment key={folder.id}>
                   <BreadcrumbLink asChild>
                     <Link href={`/repositories/${folder.id}`}>
@@ -52,11 +53,7 @@ export default async function RepositoriesPage({
           )}
         </BreadcrumbList>
       </Breadcrumb>
-      <FolderProvider
-        initialFolder={initialFolder}
-        folderId={params.repositoryId}
-        storagePath={storagePath}
-      >
+      <FolderProvider initialFolder={initialFolder}>
         <FolderList page="repositories" />
       </FolderProvider>
     </div>

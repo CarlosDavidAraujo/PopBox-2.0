@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/context-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { NewFolderForm } from "../../../components/folder-form";
+import { NewFolderForm } from "../../../components/folder-create";
 import {
   Breadcrumb,
   BreadcrumbItem,

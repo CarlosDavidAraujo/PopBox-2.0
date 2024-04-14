@@ -9,15 +9,19 @@ import Link from "next/link";
 import React from "react";
 import { FolderProvider } from "@/components/folder-provider";
 import { FolderList } from "@/components/folder-list";
+import { getServerAuthSession } from "@/server/auth";
 
 export default async function RepositoriesPage() {
+  const session = await getServerAuthSession();
+
   const initialFolder = await api.folders.getOneById({
-    folderId: "_root",
+    folderId: session!.user.id,
   });
 
   return (
     <div className="flex flex-grow flex-col gap-6">
       <h1 className="text-lg font-semibold md:text-2xl">Repositórios</h1>
+
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -27,11 +31,7 @@ export default async function RepositoriesPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <FolderProvider
-        folderId="_root"
-        initialFolder={initialFolder}
-        storagePath="_root"
-      >
+      <FolderProvider initialFolder={initialFolder}>
         <FolderList page="repositories" />
       </FolderProvider>
     </div>

@@ -4,9 +4,6 @@ import { z } from "zod";
 export const insertFolderSchema = z.object({
   name: z.string().min(1),
   parent_folder_id: z.string().nullable(),
-  /**Esse é o caminho construído a partir dos ids das pastas e não a partir dos nomes,
-   * é esse caminho que salvamos no supabase storage */
-  storagePath: z.string().min(1),
 });
 
 export const upsertDepartmentSchema = z.object({

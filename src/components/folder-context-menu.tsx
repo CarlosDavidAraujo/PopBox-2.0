@@ -8,7 +8,7 @@ import {
 } from "./ui/context-menu";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { ScrollArea } from "./ui/scroll-area";
-import { NewFolderForm } from "./folder-form";
+import { NewFolderForm } from "./folder-create";
 import { FaFolder } from "react-icons/fa";
 import { FolderPlus } from "lucide-react";
 import { FileUploader } from "./file-uploader";
